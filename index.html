@@ -1,0 +1,171 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to    -fit=no">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+  <title>PassThing</title>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <span class="navbar-brand">PassThing - Web</span>
+    </div>
+  </nav>
+  <div class="container">
+    <p>
+        <div>
+            <input type="text" id="filter_input" class="form-control" placeholder="Filter results">
+        </div>
+    </p>
+    <p>
+    <div class="list-group">
+    % for entry_name in entry_names:
+        <button type="button" class="list-group-item list-group-item-action"
+            data-toggle="modal" data-target="#exampleModal"
+            data-entryname="${entry_name}">${entry_name}</button>
+    % endfor
+    </div>
+    </p>
+  </div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="password_retrieval">
+          <div class="form-group">
+            <label for="master_password" class="col-form-label">Master password:</label>
+            <input type="password" class="form-control" id="master_password">
+            <input type="hidden" id="entry_name">
+            <span class="error text-danger collapse" id="invalid_password">Invalid password</span>
+          </div>
+      </form>
+
+      <div class="collapse" id="entry_result">
+
+      <div class="form-group">
+          <label for="username" class="col-form-label">Username:</label>
+          <input type="text" class="form-control" id="username_result">
+
+      </div>
+      <div class="form-group">
+      <label for="password" class="col-form-label">Password:</label>
+          <div class="input-group">
+              <input type="password" class="form-control" placeholder="" aria-label="Password appears here." aria-describedby="button-addon4" id="password_result">
+              <div class="input-group-append" id="button-addon4">
+                  <button class="btn btn-outline-secondary" type="button" id="toggle_visibility"><i id="toggle_visibility_icon" class="far fa-eye"></i></button>
+                  <button class="btn btn-outline-secondary" type="button" id="copy_clipboard">Copy</button>
+              </div>
+          </div>
+      </div>
+
+  </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="retrieve_button">Retrieve</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+$('#exampleModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget); // Button that triggered the modal
+  var entry_name = button.data('entryname'); // Extract info from data-* attributes
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  modal.find('.modal-title').text('Password for ' + entry_name);
+  $("#entry_name").val(entry_name);
+  setTimeout(function() { $('#master_password').focus() }, 400);
+})
+
+$('#exampleModal').on('hide.bs.modal', function (event) {
+    $("#master_password").val("");
+    $("#invalid_password").collapse('hide');
+    $('#toggle_visibility_icon').removeClass("fa-eye-slash").addClass("fa-eye");
+    $('#password_result').attr("type", "password");
+    $("#entry_result").collapse('hide');
+});
+
+$('#retrieve_button').click(function () {
+    $('#password_retrieval').submit();
+})
+
+$('#toggle_visibility').click(function (event) {
+    icon = $('#toggle_visibility_icon');
+    password_result = $('#password_result');
+    if(icon.hasClass('fa-eye-slash')) {
+        icon.removeClass("fa-eye-slash").addClass("fa-eye");
+        password_result.attr("type", "password");
+
+    }
+    else {
+        icon.removeClass("fa-eye").addClass("fa-eye-slash");
+        password_result.attr("type", "text");
+    }
+})
+
+$('#filter_input').keyup(function() {
+    filter_text = $(this).val();
+    $('button.list-group-item').each(function(foo) {
+        item_text = $(this).text();
+        if (filter_text.length > 0) {
+            if (item_text.toLowerCase().indexOf(filter_text.toLowerCase()) != -1) {
+                $(this).css('display', 'block');
+            } else {
+                $(this).css('display', 'none');
+            }
+        } else {
+            $(this).css('display', 'block');
+        }
+    })
+})
+
+$('#copy_clipboard').click(function (event) {
+    password_result = $('#password_result');
+    password_result.attr("type", "text");
+    password_result.select();
+    document.execCommand("copy");
+    password_result.attr("type", "password");
+})
+
+$("#password_retrieval").on("submit", function(){
+    master_password = $("#master_password").val()
+    $("#master_password").val("")
+    $.getJSON("get_entry", {
+        "entry_name" : $("#entry_name").val(),
+        "master_password" : master_password,
+    }, function (data) {
+        if (data.status === "success") {
+            $("#username_result").val(data.username);
+            $("#password_result").val(data.password);
+            $("#entry_result").collapse('show');
+        }
+        else if (data.status === "invalid_password") {
+            $("#invalid_password").collapse('show');
+            $("#invalid_password").focus();
+        }
+    });
+    return false;
+})
+
+$("#master_password").keydown(function () {
+    $("#invalid_password").collapse('hide');
+});
+
+</script>
+
+</body>
+</html>

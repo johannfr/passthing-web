@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+cherrypy = "*"
+mako = "*"
+passthing = {git = "https://github.com/johannfr/passthing.git"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
